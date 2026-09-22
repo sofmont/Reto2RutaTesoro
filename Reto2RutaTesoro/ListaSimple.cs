@@ -15,26 +15,32 @@ namespace Reto2RutaTesoro
             Inicio = null;
         }
 
+        // Inserción ordenada por ID (de menor a mayor)
         public bool Insertar(int id, string nombre, string pista, int nivelPeligro)
         {
+            // Validar que el ID no exista
             if (Buscar(id) != null)
-                return false; // El ID ya existe
+                return false;
 
             Nodo nuevo = new Nodo(id, nombre, pista, nivelPeligro);
 
-            if (Inicio == null)
+            // Caso 1: La lista está vacía o el nuevo ID es menor que el del primer nodo
+            if (Inicio == null || id < Inicio.Id)
             {
+                nuevo.Siguiente = Inicio;
                 Inicio = nuevo;
+                return true;
             }
-            else
+
+            // Caso 2: Buscar la posición correcta en el medio o al final
+            Nodo actual = Inicio;
+            while (actual.Siguiente != null && actual.Siguiente.Id < id)
             {
-                Nodo actual = Inicio;
-                while (actual.Siguiente != null)
-                {
-                    actual = actual.Siguiente;
-                }
-                actual.Siguiente = nuevo;
+                actual = actual.Siguiente;
             }
+
+            nuevo.Siguiente = actual.Siguiente;
+            actual.Siguiente = nuevo;
             return true;
         }
 
@@ -45,6 +51,11 @@ namespace Reto2RutaTesoro
             {
                 if (actual.Id == id)
                     return actual;
+
+                // Si encontramos un ID mayor, significa que ya no existe (por estar ordenada)
+                if (actual.Id > id)
+                    break;
+
                 actual = actual.Siguiente;
             }
             return null;
@@ -82,6 +93,11 @@ namespace Reto2RutaTesoro
                     actual.Siguiente = actual.Siguiente.Siguiente;
                     return true;
                 }
+
+                // Si el ID del siguiente nodo es mayor al buscado, no existe
+                if (actual.Siguiente.Id > id)
+                    break;
+
                 actual = actual.Siguiente;
             }
             return false;
